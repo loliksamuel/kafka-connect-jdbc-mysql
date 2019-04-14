@@ -91,8 +91,50 @@ curl -X GET http://localhost:8083/connectors/jdbc_source_mysql_01
 ksql> PRINT 'mysql-01-accounts' FROM BEGINNING;
 u will see the content of db in the topics
 insert to db
-INSERT INTO `demo`.`accounts` VALUES (21, 'lolik', 'samuel', 'loliksamuel', 'xxx', '2019-03-03', '2019-03-03 09:09:09');
+INSERT INTO demo.accounts
+(`id`,
+`first_name`,
+`last_name`,
+`username`,
+`company`,
+`created_date`) VALUES
+(30,
+'lolik10',
+'samuel10',
+'loliksamuel',
+'zim',
+'2019-03-03');
 after 10 sec, u will see it in the topic
+
+curl -X POST http://localhost:8083/connectors -H "Content-Type: application/json" -d '{
+        "name": "jdbc_source_mysql_08",
+        "config": {
+                "connector.class": "io.confluent.connect.jdbc.JdbcSourceConnector",
+                "connection.url": "jdbc:mysql://mysql:3306/demo",
+                "connection.user": "connect_user",
+                "connection.password": "asgard",
+                "topic.prefix": "mysql-08-",
+                "mode":"timestamp",
+                "table.whitelist" : "demo.accounts",
+                "timestamp.column.name": "UPDATE_TS",
+                "validate.non.null": false
+                }
+        }'
+        
+INSERT INTO demo.accounts
+(`id`,
+`first_name`,
+`last_name`,
+`username`,
+`company`,
+`created_date`) VALUES
+(31,
+'lolik11',
+'samuel11',
+'loliksamuel',
+'zim',
+'2019-03-03');
+after 1 sec, u will see it in the topic        
 ----
 
 * Postgres
