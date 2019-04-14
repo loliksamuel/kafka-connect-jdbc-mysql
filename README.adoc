@@ -64,9 +64,10 @@ docker-compose exec mssql bash -c '/opt/mssql-tools/bin/sqlcmd -l 30 -S localhos
 == Example Connector Configuration
 
 * MySQL-add connector with a post
-** GET /connectors – returns a list with all connectors in use
-** GET /connectors/{name} – returns details about a specific connector
-** POST /connectors – creates a new connector; the request body should be a JSON object containing a string name field and an object config field with the connector configuration parameters
+** curl -X GET /connectors – returns a list with all connectors in use
+** curl -X GET /connectors/{name} – returns details about a specific connector
+** curl -X DELETE /connectors/{name} – delete  specific connector
+** curl -X POST /connectors – creates a new connector; the request body should be a JSON object containing a string name field and an object config field with the connector configuration parameters
 +
 [source,bash]
 ----
@@ -79,19 +80,19 @@ curl -X POST http://localhost:8083/connectors -H "Content-Type: application/json
                 "connection.password": "asgard",
                 "topic.prefix": "mysql-01-",
                 "mode":"bulk",
-                "poll.interval.ms" : 3600000
+                "poll.interval.ms" : 10000
                 }
         }'
 
  response:
-        {"name":"jdbc_source_mysql_01","config":{"connector.class":"io.confluent.connect.jdbc.JdbcSourceConnector","connection.url":"jdbc:mysql://mysql:3306/demo","connection.user":"connect_user","connection.password":"asgard","topic.prefix":"mysql-01-","mode":"bulk","poll.interval.ms":"3600000","name":"jdbc_source_mysql_01"},"tasks":[],"type":null}
+        {"name":"jdbc_source_mysql_01","config":{"connector.class":"io.confluent.connect.jdbc.JdbcSourceConnector","connection.url":"jdbc:mysql://mysql:3306/demo","connection.user":"connect_user","connection.password":"asgard","topic.prefix":"mysql-01-","mode":"bulk","poll.interval.ms":"10000","name":"jdbc_source_mysql_01"},"tasks":[],"type":null}
 curl -X GET http://localhost:8083/connectors/
 curl -X GET http://localhost:8083/connectors/jdbc_source_mysql_01
-ksql> PRINT 'docker-connect-offsets' FROM BEGINNING;
+ksql> PRINT 'mysql-01-accounts' FROM BEGINNING;
 u will see the content of db in the topics
 insert to db
 INSERT INTO `demo`.`accounts` VALUES (21, 'lolik', 'samuel', 'loliksamuel', 'xxx', '2019-03-03', '2019-03-03 09:09:09');
-after an hour u will see it in the topic
+after 10 sec, u will see it in the topic
 ----
 
 * Postgres
