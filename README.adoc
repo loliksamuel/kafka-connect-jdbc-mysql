@@ -86,8 +86,10 @@ curl -X POST http://localhost:8083/connectors -H "Content-Type: application/json
 
  response:
         {"name":"jdbc_source_mysql_01","config":{"connector.class":"io.confluent.connect.jdbc.JdbcSourceConnector","connection.url":"jdbc:mysql://mysql:3306/demo","connection.user":"connect_user","connection.password":"asgard","topic.prefix":"mysql-01-","mode":"bulk","poll.interval.ms":"10000","name":"jdbc_source_mysql_01"},"tasks":[],"type":null}
-curl -X GET http://localhost:8083/connectors/
-curl -X GET http://localhost:8083/connectors/jdbc_source_mysql_01
+curl -s -X GET http://localhost:8083/connectors/|jq
+curl -s -X GET http://localhost:8083/connectors/jdbc_source_mysql_01|jq
+curl -s -X GET "http://localhost:8083/connectors/jdbc_source_mysql_08/status"|jq
+
 ksql> PRINT 'mysql-01-accounts' FROM BEGINNING;
 u will see the content of db in the topics
 insert to db
@@ -134,7 +136,12 @@ INSERT INTO demo.accounts
 'loliksamuel',
 'zim',
 '2019-03-03');
-after 1 sec, u will see it in the topic        
+after 1 sec, u will see it in the topic
+
+update demo.accounts set first_name = 'lolik311' where id=31;
+delete from demo.accounts where id=31;
+
+
 ----
 
 * Postgres
