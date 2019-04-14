@@ -93,7 +93,7 @@ curl -s -X GET "http://localhost:8083/connectors/jdbc_source_mysql_08/status"|jq
 ksql> PRINT 'mysql-01-accounts' FROM BEGINNING;
 u will see the content of db in the topics
 insert to db
-INSERT INTO demo.accounts
+mysql>INSERT INTO demo.accounts
 (`id`,
 `first_name`,
 `last_name`,
@@ -123,7 +123,7 @@ curl -X POST http://localhost:8083/connectors -H "Content-Type: application/json
                 }
         }'
         
-INSERT INTO demo.accounts
+mysql>INSERT INTO demo.accounts
 (`id`,
 `first_name`,
 `last_name`,
@@ -138,9 +138,13 @@ INSERT INTO demo.accounts
 '2019-03-03');
 after 1 sec, u will see it in the topic
 
-update demo.accounts set first_name = 'lolik311' where id=31;
-delete from demo.accounts where id=31;
+mysql>update demo.accounts set first_name = 'lolik311' where id=31;
+mysql>delete from demo.accounts where id=31;
 
+ksql>CREATE TABLE ACCOUNTGROUPBY WITH (PARTITIONS=1,REPLICAS=1) AS select last_name, count(*) as count from demo.accounts group by last_name;
+ksql>CREATE STREAM accountGroupByStream (last_name string, COUNT bigint) WITH (kafka_topic='ACCOUNTGROUPBY', value_format='JSON') ;
+ksql>list topics;
+ksql>list streams;
 
 ----
 
