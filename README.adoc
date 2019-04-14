@@ -22,7 +22,7 @@ The associated blog article can be found at https://www.confluent.io/blog/kafka-
 ----
 docker-compose exec ksql-cli ksql http://ksql-server:8088
 ksql> LIST TOPICS;
-ksql> PRINT 'docker-connect-offsets' FROM BEGINNING;
+ksql> PRINT 'mysql-01-accounts' FROM BEGINNING
 ksql> CREATE STREAM ACCOUNTS WITH (KAFKA_TOPIC='mysql-06X-accounts', VALUE_FORMAT='AVRO');
 ksql> SELECT ROWKEY, ID, FIRST_NAME + ' ' + LAST_NAME FROM ACCOUNTS;
 ----
