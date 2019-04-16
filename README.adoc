@@ -71,6 +71,7 @@ docker-compose exec mssql bash -c '/opt/mssql-tools/bin/sqlcmd -l 30 -S localhos
 +
 [source,bash]
 ----
+create a connector(using bulk is not a best practice)
 curl -X POST http://localhost:8083/connectors -H "Content-Type: application/json" -d '{
         "name": "jdbc_source_mysql_01",
         "config": {
@@ -108,6 +109,7 @@ mysql>INSERT INTO demo.accounts
 '2019-03-03');
 after 10 sec, u will see it in the topic
 
+create another connector in mode : timestamp
 curl -X POST http://localhost:8083/connectors -H "Content-Type: application/json" -d '{
         "name": "jdbc_source_mysql_08",
         "config": {
@@ -136,11 +138,12 @@ mysql>INSERT INTO demo.accounts
 'loliksamuel',
 'zim',
 '2019-03-03');
-after 1 sec, u will see it in the topic
+verify after 1 sec, that u see it in the topic
 
 mysql>update demo.accounts set first_name = 'lolik311' where id=31;
+verify after 1 sec, that u see it in the topic
 mysql>delete from demo.accounts where id=31;
-note:   jdbc connector does not support delete oparations. if u need it than consider use cdc transaction-log connector.
+verify that jdbc connector does not support delete oparations. if u need it than consider use cdc transaction-log connector.
 
 ksql>CREATE TABLE ACCOUNTGROUPBY WITH (PARTITIONS=1,REPLICAS=1) AS select last_name, count(*) as count from demo.accounts group by last_name;
 ksql>CREATE STREAM accountGroupByStream (last_name string, COUNT bigint) WITH (kafka_topic='ACCOUNTGROUPBY', value_format='JSON') ;
