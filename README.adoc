@@ -29,8 +29,8 @@ docker-compose exec ksql-cli ksql http://ksql-server:8088
 [source,bash]
 ----
 docker exec -it kafka-connect-jdbc-mysql_kafka-connect_1 bash
-cd /usr/share/java/kafka-connect-jdbc
-ls |grep  ojdbc8.jar
+cd /usr/share/java/kafka-connect-jdbc/jars
+ ls |grep  ojdbc8.jar
 ----
 * MySQL
 +
