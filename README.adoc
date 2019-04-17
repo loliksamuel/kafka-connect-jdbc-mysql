@@ -72,6 +72,8 @@ docker-compose exec mssql bash -c '/opt/mssql-tools/bin/sqlcmd -l 30 -S localhos
 [source,bash]
 ----
 create a connector(using bulk is not a best practice)
+curl -X POST http://localhost:8083/connectors -H "Content-Type: application/json" -d "@jdbc_source_mysql_01.json" 
+or
 curl -X POST http://localhost:8083/connectors -H "Content-Type: application/json" -d '{
         "name": "jdbc_source_mysql_01",
         "config": {
