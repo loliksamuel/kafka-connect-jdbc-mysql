@@ -82,15 +82,16 @@ docker-compose exec mssql bash -c '/opt/mssql-tools/bin/sqlcmd -l 30 -S localhos
 create a connector(using bulk is not a best practice)
 or
 curl -X POST http://localhost:8083/connectors -H "Content-Type: application/json" -d '{
-        "name": "jdbc_source_mysql_01",
+        "name": "jdbc_source_mysql_08",
         "config": {
                 "connector.class": "io.confluent.connect.jdbc.JdbcSourceConnector",
                 "connection.url": "jdbc:mysql://mysql:3306/demo",
                 "connection.user": "connect_user",
                 "connection.password": "asgard",
-                "topic.prefix": "mysql-01-",
+                "topic.prefix": "mysql-08-",
                 "mode":"bulk",
-                "poll.interval.ms" : 10000
+                "table.whitelist" : "demo.accounts",
+                "poll.interval.ms" : 360000
                 }
         }'
 
@@ -134,33 +135,37 @@ curl -X POST http://localhost:8083/connectors -H "Content-Type: application/json
                 }
         }'
         
-mysql>INSERT INTO demo.accounts
-(`id`,
-`first_name`,
-`last_name`,
-`username`,
-`company`,
-`created_date`) VALUES
-(31,
-'lolik11',
-'samuel11',
-'loliksamuel',
-'zim',
-'2019-03-03');
+
+mysql> INSERT INTO demo.accounts (`id`, `first_name`, `last_name`, `username`, `company`, `created_date`) VALUES (30, 'lolik10', 'samuel10', 'loliksamuel', 'zim', '2019-03-03');
+Query OK, 1 row affected (0.00 sec)
 verify after 1 sec, that u see it in the topic
 
 mysql>update demo.accounts set first_name = 'lolik311' where id=31;
 verify after 1 sec, that u see it in the topic
+
 mysql>delete from demo.accounts where id=31;
 verify that jdbc connector does not support delete oparations. if u need it than consider use cdc transaction-log connector.
 
-ksql>CREATE TABLE ACCOUNTGROUPBY WITH (PARTITIONS=1,REPLICAS=1) AS select last_name, count(*) as count from demo.accounts group by last_name;
-ksql>CREATE STREAM accountGroupByStream (last_name string, COUNT bigint) WITH (kafka_topic='ACCOUNTGROUPBY', value_format='JSON') ;
-ksql>list topics;
-ksql>list streams;
-ksql>list queries;
+ksql> CREATE TABLE users (registertime BIGINT,  userid VARCHAR, gender VARCHAR, regionid VARCHAR)  WITH (KAFKA_TOPIC = 'mysql-08-accounts',  VALUE_FORMAT='JSON', KEY = 'userid');
+ksql>SHOW | LIST tables;
+ksql> DESCRIBE [EXTENDED] users;
+ksql>DROP TABLE  IF EXISTS  users;
+ksql>SHOW | LIST tables;
+ksql> CREATE TABLE mysql-08-accounts-table (id INT,  company VARCHAR)  WITH (KAFKA_TOPIC = 'mysql-08-accounts',  VALUE_FORMAT='JSON', KEY = 'id');
+ksql>CREATE TABLE accountGroupByStream (last_name string, COUNT bigint) WITH (kafka_topic='mysql-08-accounts', value_format='JSON') ;
+ksql>CREATE TABLE accountGroupByTable  (usertimestamp BIGINT, user_id VARCHAR, gender VARCHAR, region_id VARCHAR) KAFKA_TOPIC = 'mysql-08-accounts',KEY = 'user_id');
+ksql>CREATE STREAM accountGroupByStream (last_name string, COUNT bigint) WITH (kafka_topic='mysql-08-accounts', value_format='JSON') ;
+CREATE TABLE users (UPDATE_TS BIGINT, id VARCHAR, first_name VARCHAR, company VARCHAR) KAFKA_TOPIC = 'mysql-08-accounts', KEY = 'id');
+ksql>SHOW | LIST topics;
+ksql>SHOW | LIST streams;
+ksql>SHOW | LIST tables;
+ksql>SHOW | LIST queries;
+ksql>SHOW | LIST functions;
+ksql>SHOW | LIST properties;
 ksql>print 'ACCOUNTGROUPBY' FROM BEGINNING;
 ???
+ksql>DROP TABLE [IF EXISTS] table_name [DELETE TOPIC];
+ksql>DROP STREAM [IF EXISTS] stream_name [DELETE TOPIC];
 ksql> PRINT 'mysql-01-accounts' FROM BEGINNING
 ksql> CREATE STREAM ACCOUNTS WITH (KAFKA_TOPIC='mysql-06X-accounts', VALUE_FORMAT='AVRO');
 ksql> SELECT ROWKEY, ID, FIRST_NAME + ' ' + LAST_NAME FROM ACCOUNTS;
@@ -190,6 +195,8 @@ curl -X POST http://localhost:8083/connectors -H "Content-Type: application/json
 +
 [source,bash]
 ----
+cp ojdbc8.jar
+docker cp /db-leach/jdbc/lib/ojdbc8.jar kafka-connect-jdbc-mysql_kafka-connect_1:/usr/share/java/kafka-connect-jdbc
 curl -X POST http://localhost:8083/connectors -H "Content-Type: application/json" -d '{
                 "name": "jdbc_source_oracle_01",
                 "config": {
