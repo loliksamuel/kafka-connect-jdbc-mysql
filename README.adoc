@@ -5,7 +5,9 @@ This Docker Compose can be used to spin up an environment in which to explore an
 The associated blog article can be found at https://www.confluent.io/blog/kafka-connect-deep-dive-jdbc-source-connector
 
 .Current environment
-
+----
+docker-compose up -d
+----
 |=====================================================================
 |Confluent Platform | 5.1.0
 |MySQL              | 8.0.13
@@ -14,7 +16,7 @@ The associated blog article can be found at https://www.confluent.io/blog/kafka-
 |Oracle             | 12.2.0.1.0  (from github)
 |=====================================================================
 
-== Getting a CLI session
+== Getting into ksql, and db containers
 
 * KSQL
 +
