@@ -91,6 +91,7 @@ services:
         cd /usr/share/java/kafka-connect-jdbc/
         curl http://central.maven.org/maven2/com/microsoft/sqlserver/mssql-jdbc/7.0.0.jre8/mssql-jdbc-7.0.0.jre8.jar --output mssql-jdbc-7.0.0.jre8.jar
         # # Oracle
+        #docker cp /db-leach/jdbc/lib/ojdbc8.jar kafka-connect-jdbc-mysql_kafka-connect_1:/usr/share/java/kafka-connect-jdbc
         cp /db-leach/jdbc/lib/ojdbc8.jar /usr/share/java/kafka-connect-jdbc
         # Now launch Kafka Connect
         sleep infinity &
