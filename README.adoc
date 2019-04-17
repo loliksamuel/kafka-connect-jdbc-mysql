@@ -11,7 +11,7 @@ The associated blog article can be found at https://www.confluent.io/blog/kafka-
 |MySQL              | 8.0.13
 |Postgres           | 11.1
 |MS SQL Server      | 2017 (RTM-CU13) (KB4466404) - 14.0.3048.4 (X64)
-|Oracle             | 12.2.0.1.0
+|Oracle             | 12.2.0.1.0  (from github)
 |=====================================================================
 
 == Getting a CLI session
@@ -21,10 +21,6 @@ The associated blog article can be found at https://www.confluent.io/blog/kafka-
 [source,bash]
 ----
 docker-compose exec ksql-cli ksql http://ksql-server:8088
-ksql> LIST TOPICS;
-ksql> PRINT 'mysql-01-accounts' FROM BEGINNING
-ksql> CREATE STREAM ACCOUNTS WITH (KAFKA_TOPIC='mysql-06X-accounts', VALUE_FORMAT='AVRO');
-ksql> SELECT ROWKEY, ID, FIRST_NAME + ' ' + LAST_NAME FROM ACCOUNTS;
 ----
 
 * MySQL
@@ -66,18 +62,22 @@ docker-compose exec mssql bash -c '/opt/mssql-tools/bin/sqlcmd -l 30 -S localhos
 ----
 
 
-== Example Connector Configuration
+==  Connector Configuration
 
 * MySQL-add connector with a post
 ** curl -X GET http://localhost:8083/connectors – returns a list with all connectors in use
 ** curl -X GET http://localhost:8083/connectors/{name} – returns details about a specific connector
 ** curl -X DELETE http://localhost:8083/connectors/{name} – delete  specific connector
 ** curl -X POST http://localhost:8083/connectors – creates a new connector; the request body should be a JSON object containing a string name field and an object config field with the connector configuration parameters
+** curl -X POST http://localhost:8083/connectors -H "Content-Type: application/json" -d "@jdbc_source_mysql_01.json"
+
+==  Play with ksql
 +
 [source,bash]
 ----
+
+
 create a connector(using bulk is not a best practice)
-curl -X POST http://localhost:8083/connectors -H "Content-Type: application/json" -d "@jdbc_source_mysql_01.json" 
 or
 curl -X POST http://localhost:8083/connectors -H "Content-Type: application/json" -d '{
         "name": "jdbc_source_mysql_01",
@@ -156,8 +156,12 @@ ksql>CREATE TABLE ACCOUNTGROUPBY WITH (PARTITIONS=1,REPLICAS=1) AS select last_n
 ksql>CREATE STREAM accountGroupByStream (last_name string, COUNT bigint) WITH (kafka_topic='ACCOUNTGROUPBY', value_format='JSON') ;
 ksql>list topics;
 ksql>list streams;
-print 'ACCOUNTGROUPBY' FROM BEGINNING;
+ksql>list queries;
+ksql>print 'ACCOUNTGROUPBY' FROM BEGINNING;
 ???
+ksql> PRINT 'mysql-01-accounts' FROM BEGINNING
+ksql> CREATE STREAM ACCOUNTS WITH (KAFKA_TOPIC='mysql-06X-accounts', VALUE_FORMAT='AVRO');
+ksql> SELECT ROWKEY, ID, FIRST_NAME + ' ' + LAST_NAME FROM ACCOUNTS;
 ----
 
 * Postgres
