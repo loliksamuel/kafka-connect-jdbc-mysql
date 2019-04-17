@@ -32,10 +32,15 @@ ksql> SELECT ROWKEY, ID, FIRST_NAME + ' ' + LAST_NAME FROM ACCOUNTS;
 [source,bash]
 ----
 To connect to the DB:
+MYSQL_ROOT_PASSWORD=Admin123
+echo $MYSQL_ROOT_PASSWORD
 docker-compose exec mysql bash -c 'mysql -u root -p$MYSQL_ROOT_PASSWORD'
  or
 docker exec -it bxxxx bash  --user=root --password=$MYSQL_ROOT_PASSWORD
 mysql>ALTER USER 'root' IDENTIFIED WITH mysql_native_password BY '123';
+mysql> show databases;
+mysql> use demo;
+mysql>select id,first_name,last_name, username, company,created_date,update_ts from accounts;
 mysql>exit
 ----
 
