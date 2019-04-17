@@ -16,7 +16,7 @@ docker-compose up -d
 |Oracle             | 12.2.0.1.0  (from github)
 |=====================================================================
 
-== Getting into ksql, and db containers
+== Get inside containers
 
 * KSQL
 +
@@ -24,7 +24,12 @@ docker-compose up -d
 ----
 docker-compose exec ksql-cli ksql http://ksql-server:8088
 ----
-
+* kafka connect
++
+[source,bash]
+----
+docker exec -it confluentinc/cp-kafka-connect:5.1.0  bash
+----
 * MySQL
 +
 [source,bash]
