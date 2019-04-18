@@ -143,13 +143,14 @@ ksql> DESCRIBE [EXTENDED] users;
 ksql>DROP TABLE  IF EXISTS  users;
 ksql>SHOW | LIST tables;
 ksql>CREATE TABLE mysql-08-accounts-table (id INT,  company VARCHAR)  WITH (KAFKA_TOPIC = 'mysql-08-accounts',  VALUE_FORMAT='JSON', KEY = 'id');
-ksql>CREATE TABLE accountGroupByTable  (last_name string, COUNT bigint) WITH (kafka_topic='mysql-08-accounts', value_format='JSON') ;
-ksql>describe extended accountGroupByTable; --see the columns & how many massages
-ksql>select * from accountGroupByTable;
+ksql>CREATE TABLE accountGroupByTable WITH (PARTITIONS=1,REPLICAS=1) AS select last_name, count(*) as count from demo.accounts group by last_name;
+ksql>CREATE TABLE accountGroupByTable2  (last_name string, COUNT bigint) WITH (kafka_topic='mysql-08-accounts', value_format='JSON') ;
+ksql>describe extended accountGroupByTable2; --see the columns & how many massages
+ksql>select * from accountGroupByTable2;
 note u do not see anything. it is because no new data is inserted. let's insert in different window...
 mysql> INSERT INTO demo.accounts (`id`, `first_name`, `last_name`, `username`, `company`, `created_date`) VALUES (40, 'lolik40', 'samuel', 'loliksamuel', 'zim', '2019-03-03');
 Query OK, 1 row affected (0.00 sec)
-verify after 1 sec, that u see it in the table
+verify after 1 sec, that u see it in the table accountGroupByTable2
 
 ksql>CREATE TABLE accountGroupByTable  (usertimestamp BIGINT, user_id VARCHAR, gender VARCHAR, region_id VARCHAR) KAFKA_TOPIC = 'mysql-08-accounts',KEY = 'user_id');
 ksql>CREATE STREAM accountGroupByStream (last_name string, COUNT bigint) WITH (kafka_topic='mysql-08-accounts', value_format='JSON') ;
