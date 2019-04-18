@@ -2,12 +2,9 @@
 
 This Docker Compose can be used to spin up an environment in which to explore and test the Kafka Connect JDBC source connector. 
 
-The associated blog article can be found at https://www.confluent.io/blog/kafka-connect-deep-dive-jdbc-source-connector
+see article at https://www.confluent.io/blog/kafka-connect-deep-dive-jdbc-source-connector
 
-.Current environment
-----
-docker-compose up -d
-----
+Current environment
 |=====================================================================
 |Confluent Platform | 5.1.0
 |MySQL              | 8.0.13
@@ -18,10 +15,16 @@ docker-compose up -d
 
 == Get inside containers
 
-+
+
 [source,bash]
 ----
-KAFKA KSQL
+docker-compose up -d
+
+KAFKA KSQL-(guidelines for a basic KSQL server:
+           4 cores
+           32 GB RAM
+           100 GB SSD
+           1 Gbit network)
 docker-compose exec ksql-cli ksql http://ksql-server:8088
 
 KAFKA CONNECT
@@ -30,8 +33,7 @@ cd /usr/share/java/kafka-connect-jdbc/jars
  ls |grep  ojdbc8.jar
 
 MySQL
-MYSQL_ROOT_PASSWORD=Admin123
-echo $MYSQL_ROOT_PASSWORD
+MYSQL_ROOT_PASSWORD=Admin123 & echo $MYSQL_ROOT_PASSWORD
 docker-compose exec mysql bash -c 'mysql -u root -p$MYSQL_ROOT_PASSWORD'
  or
 docker exec -it bxxxx bash  --user=root --password=$MYSQL_ROOT_PASSWORD
@@ -59,14 +61,11 @@ docker-compose exec mssql bash -c '/opt/mssql-tools/bin/sqlcmd -l 30 -S localhos
 ** curl -X GET http://localhost:8083/connectors/{name} – returns details about a specific connector
 ** curl -X DELETE http://localhost:8083/connectors/{name} – delete  specific connector
 ** curl -X POST http://localhost:8083/connectors – creates a new connector; the request body should be a JSON object containing a string name field and an object config field with the connector configuration parameters
-** curl -X POST http://localhost:8083/connectors -H "Content-Type: application/json" -d "@jdbc_source_mysql_01.json"
-
+** curl -X POST http://localhost:8083/connectors -H "Content-Type: application/json" -d "@data_oracle08.json"
 ==  Play with ksql
-+
+
 [source,bash]
 ----
-
-
 create a connector(using bulk is not a best practice)
 or
 curl -X POST http://localhost:8083/connectors -H "Content-Type: application/json" -d '{
