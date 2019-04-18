@@ -18,25 +18,18 @@ docker-compose up -d
 
 == Get inside containers
 
-* KSQL
 +
 [source,bash]
 ----
+KAFKA KSQL
 docker-compose exec ksql-cli ksql http://ksql-server:8088
-----
-* kafka connect
-+
-[source,bash]
-----
+
+KAFKA CONNECT
 docker exec -it kafka-connect-jdbc-mysql_kafka-connect_1 bash
 cd /usr/share/java/kafka-connect-jdbc/jars
  ls |grep  ojdbc8.jar
-----
-* MySQL
-+
-[source,bash]
-----
-To connect to the DB:
+
+MySQL
 MYSQL_ROOT_PASSWORD=Admin123
 echo $MYSQL_ROOT_PASSWORD
 docker-compose exec mysql bash -c 'mysql -u root -p$MYSQL_ROOT_PASSWORD'
@@ -47,26 +40,14 @@ mysql> show databases;
 mysql> use demo;
 mysql>select id,first_name,last_name, username, company,created_date,update_ts from accounts;
 mysql>exit
-----
 
-* Postgres
-+
-[source,bash]
-----
+POSTGRES
 docker-compose exec postgres bash -c 'psql -U $POSTGRES_USER $POSTGRES_DB'
-----
 
-* Oracle
-+
-[source,bash]
-----
+ORACLE
 docker-compose exec oracle bash -c 'sqlplus sys/$ORACLE_PWD@localhost:1521/ORCLCDB as sysdba'
-----
 
-* MS SQL Server
-+
-[source,bash]
-----
+MS SQL SERVER
 docker-compose exec mssql bash -c '/opt/mssql-tools/bin/sqlcmd -l 30 -S localhost -U sa -P $SA_PASSWORD'
 ----
 
@@ -141,7 +122,8 @@ curl -X POST http://localhost:8083/connectors -H "Content-Type: application/json
                 "validate.non.null": false
                 }
         }'
-        
+
+
 
 mysql> INSERT INTO demo.accounts (`id`, `first_name`, `last_name`, `username`, `company`, `created_date`) VALUES (30, 'lolik10', 'samuel10', 'loliksamuel', 'zim', '2019-03-03');
 Query OK, 1 row affected (0.00 sec)
@@ -191,7 +173,8 @@ curl -X POST http://localhost:8083/connectors -H "Content-Type: application/json
                 "connection.password": "asgard",
                 "topic.prefix": "postgres-01-",
                 "mode":"bulk",
-                "poll.interval.ms" : 3600000
+                "poll.interval.ms" : 3600000,
+                "query" :"select * from accounts where company IN(\"Marvin Inc\", \"Wiza Inc\")"
                 }
         }'
 

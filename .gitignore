@@ -53,9 +53,7 @@ captures/
 
 # IntelliJ
 
-.idea/tasks.xml
-.idea/gradle.xml
-.idea/assetWizardSettings.xml
+.idea/*.xml
 .idea/dictionaries
 .idea/libraries
 .idea/caches
@@ -90,8 +88,7 @@ fastlane/readme.md
 ### Example user template template
 ### Example user template
 
-# IntelliJ project files
-.idea
+
 
 out
 gen
