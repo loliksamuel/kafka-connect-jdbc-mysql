@@ -46,10 +46,10 @@ if [[ $(docker-compose logs connect) =~ "server returned information about unkno
 fi
 
 # Verify Kafka Connect Worker has started within 60 seconds
-MAX_WAIT=60
+MAX_WAIT=180
 CUR_WAIT=0
 while [[ ! $(docker logs connect) =~ "Kafka Connect started" ]]; do
-  sleep 10
+  sleep 20
   CUR_WAIT=$(( CUR_WAIT+3 ))
   if [[ "$CUR_WAIT" -gt "$MAX_WAIT" ]]; then
     echo -e "\nERROR: The logs in Kafka Connect container do not show 'Kafka Connect started'. Please troubleshoot with 'docker-compose ps' and 'docker-compose logs'.\n"
