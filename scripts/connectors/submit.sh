@@ -60,6 +60,24 @@ EOF
 )
 
 
+DATA4=$( cat << EOF
+{
+        "name": "src_mysql_txn",
+        "config": {
+                "connector.class": "io.confluent.connect.jdbc.JdbcSourceConnector",
+                "connection.url": "jdbc:mysql://mysql:3306/demo",
+                "connection.user": "connect_user",
+                "connection.password": "asgard",
+                "topic.prefix": "mysql-20-",
+                "mode":"incrementing",
+                "table.whitelist" : "demo.transactions",
+                "incrementing.column.name": "txn_id",
+                "validate.non.null": false
+                }
+        }'
+EOF
+)
+
 #   CONNECT_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM: "HTTPS"
 #   CONNECT_REST_ADVERTISED_HOST_NAME: "connect"
 #  https://connect:8083/connectors
@@ -68,4 +86,5 @@ EOF
 docker exec connect curl -X POST -H "${HEADER}" --data "${DATA1}" http://localhost:8083/connectors
 docker exec connect curl -X POST -H "${HEADER}" --data "${DATA2}" http://localhost:8083/connectors
 docker exec connect curl -X POST -H "${HEADER}" --data "${DATA3}" http://localhost:8083/connectors
+docker exec connect curl -X POST -H "${HEADER}" --data "${DATA4}" http://localhost:8083/connectors
  curl http://localhost:8083/connectors|jq

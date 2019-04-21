@@ -27,7 +27,7 @@ run ./scripts/start.sh
 
 MySQL
 MYSQL_ROOT_PASSWORD=Admin123 & echo $MYSQL_ROOT_PASSWORD
-docker exec -it db_mysql bash  --user=root --password=$MYSQL_ROOT_PASSWORD
+docker exec -it db_mysql bash  -c 'mysql -u root -p$MYSQL_ROOT_PASSWORD'
 or
 docker-compose exec mysql bash -c 'mysql -u root -p$MYSQL_ROOT_PASSWORD'
 mysql>ALTER USER 'root' IDENTIFIED WITH mysql_native_password BY '123';
@@ -57,7 +57,6 @@ POSTGRES
 docker exec -it db_postgres psql kafka-sink connect_user
 or
 docker-compose exec postgres bash -c 'psql -U $POSTGRES_USER $POSTGRES_DB'
-
 kafka-sink=# SELECT * from accounts;
 expect to see 10 accounts that moved here from mysql through kafka
 
@@ -65,8 +64,14 @@ expect to see 10 accounts that moved here from mysql through kafka
 STOP
 run ./scripts/stop.sh
 
+
+SCHEMA-REGISTRY
+docker logs schema-registry
+
+
 ORACLE
 docker-compose exec db_oracle bash -c 'sqlplus sys/$ORACLE_PWD@localhost:1521/ORCLCDB as sysdba'
+
 
 MS SQL SERVER
 docker-compose exec db_mssql bash -c '/opt/mssql-tools/bin/sqlcmd -l 30 -S localhost -U sa -P $SA_PASSWORD'
@@ -82,7 +87,7 @@ docker-compose exec db_mssql bash -c '/opt/mssql-tools/bin/sqlcmd -l 30 -S local
 ** curl http://localhost:8083/connectors/{name}  -X DELETE – delete  specific connector
 ** curl http://localhost:8083/connectors -X POST – creates a new connector; the request body should be a JSON object containing a string name field and an object config field with the connector configuration parameters
 ** curl http://localhost:8083/connectors -X POST -H "Content-Type: application/json" -d "@data_oracle08.json"
-
+** curl -s "http://localhost:8081/subjects"|jq - schema registry
 ==  Play with system manually
 
 https://docs.confluent.io/current/connect/kafka-connect-jdbc/source-connector/source_config_options.html
@@ -159,16 +164,47 @@ verify after 1 sec, that u see it in the topic
 
 mysql>delete from demo.accounts where id=31;
 verify that jdbc connector does not support delete oparations. if u need it than consider use cdc transaction-log connector.
+curl -X POST http://localhost:8083/connectors -H "Content-Type: application/json" -d '{
+          "name": "src_mysql_12b",
+          "config": {
+                  "connector.class": "io.confluent.connect.jdbc.JdbcSourceConnector",
+                  "connection.url": "jdbc:mysql://mysql:3306/demo",
+                  "connection.user": "connect_user",
+                  "connection.password": "asgard",
+                  "topic.prefix": "mysql-12b-",
+                  "numeric.mapping": "best_fit",
+                  "table.whitelist" : "demo.transactions",
+                  "mode":"incrementing","incrementing.column.name": "txn_id",
+                  "poll.interval.ms" : 3600000,
+                  "validate.non.null": false
+                  }
+          }'
+
+
+
+
+
+ksql> PRINT 'mysql-01-transactions' FROM BEGINNING;
+verify a problem :decimal amount field is not serialized correctly. we will have to fix the connector:add "numeric.mapping": "best_fit"
+4/21/19 3:11:04 PM UTC, null, {"txn_id": 1000, "customer_id": 5, "amount": {"bytes": "\nÿ"}, "currency": "IRR", "txn_timestamp": "2018-01-12T14:53:49Z"}
+
+curl localhost:8081/subjects/mysql-12a-transactions-value/versions/1 |jq '.schema|fromjson.fields[] | select (.name == "amount")'
+
+
+mysql>INSERT INTO demo.transactions   VALUES (1001, 1, 1.11, 'RUB', now());
 ----
 
 ==  Play with KSQL TABLE AND STREAMS
 
-----
+
 
 Use the CREATE STREAM statement to create a stream from a Kafka topic.
 Use the CREATE STREAM AS SELECT statement to create a query stream from an existing stream.
 KSQL can't infer the topic's data format, so you must provide the format of the values that are stored in the topic
+----
 ksql> set 'auto.offset.reset'='earliest';
+ksql> CREATE STREAM ACCOUNTS WITH (KAFKA_TOPIC='mysql-08-accounts', VALUE_FORMAT='AVRO');
+ksql> SELECT ROWKEY, ID, FIRST_NAME + ' ' + LAST_NAME FROM ACCOUNTS;
 ksql>CREATE TABLE users (registertime BIGINT,  userid VARCHAR, gender VARCHAR, regionid VARCHAR)  WITH (KAFKA_TOPIC = 'mysql-08-accounts',  VALUE_FORMAT='JSON', KEY = 'userid');
 ksql>SHOW | LIST tables;
 ksql>DESCRIBE [EXTENDED] users;
@@ -198,8 +234,7 @@ ksql>print 'ACCOUNTGROUPBY' FROM BEGINNING;
 ksql>DROP TABLE [IF EXISTS] table_name [DELETE TOPIC];
 ksql>DROP STREAM [IF EXISTS] stream_name [DELETE TOPIC];
 ksql> PRINT 'mysql-01-accounts' FROM BEGINNING
-ksql> CREATE STREAM ACCOUNTS WITH (KAFKA_TOPIC='mysql-06X-accounts', VALUE_FORMAT='AVRO');
-ksql> SELECT ROWKEY, ID, FIRST_NAME + ' ' + LAST_NAME FROM ACCOUNTS;
+
 
 docker exec -it db_postgres psql kafka-sink connect_user
 kafka-sink=# \h
