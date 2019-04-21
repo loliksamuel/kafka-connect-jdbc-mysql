@@ -91,14 +91,15 @@ docker-compose exec db_mssql bash -c '/opt/mssql-tools/bin/sqlcmd -l 30 -S local
 
 ==  Play with system manually
 
-https://docs.confluent.io/current/connect/kafka-connect-jdbc/source-connector/source_config_options.html
-[source,bash]
-----
 in order to execute connector u can run  3 scripts or manually
 run ./scripts/connectors/submit.sh
 or create 3 connectors manually
-create a connector(using bulk is not a best practice, Valid Values: [, bulk, timestamp, incrementing, timestamp+incrementing])
-or
+
+https://docs.confluent.io/current/connect/kafka-connect-jdbc/source-connector/source_config_options.html
+[source,bash]
+----
+
+
 curl -X POST http://localhost:8083/connectors -H "Content-Type: application/json" -d '{
         "name": "jdbc_source_mysql_08",
         "config": {
@@ -202,6 +203,7 @@ mysql>INSERT INTO demo.transactions   VALUES (1001, 1, 1.11, 'RUB', now());
 Use the CREATE STREAM statement to create a stream from a Kafka topic.
 Use the CREATE STREAM AS SELECT statement to create a query stream from an existing stream.
 KSQL can't infer the topic's data format, so you must provide the format of the values that are stored in the topic
+create a connector(using bulk is not a best practice, Valid Values: [, bulk, timestamp, incrementing, timestamp+incrementing])
 ----
 ksql> set 'auto.offset.reset'='earliest';
 ksql> CREATE STREAM ACCOUNTS WITH (KAFKA_TOPIC='mysql-08-accounts', VALUE_FORMAT='AVRO');
