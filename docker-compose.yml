@@ -18,7 +18,7 @@ services:
     # Exposes 9092 for external connections to the broker
     # Use kafka:29092 for connections internal on the docker network
     # See https://rmoff.net/2018/08/02/kafka-listeners-explained/ for details
-    # use docker exec -it kafka bash
+    # use docker exec -it kafka-broker bash
     # cd opt/kafka/bin
     # kafka-topics.sh --list --zookeeper zookeeper:2181 
     # kafka-topics.sh --create --topic my-topic --zookeeper zookeeper:2181 --partitions 1 --replication-factor 1
@@ -119,12 +119,13 @@ services:
       KSQL_LISTENERS: http://0.0.0.0:8088
       KSQL_KSQL_SCHEMA_REGISTRY_URL: http://schema-registry:8081
       KSQL_KSQL_SERVICE_ID: confluent_rmoff_01
+      # KSQL_KSQL_QUERIES_FILE: /etc/ksql/queries/examples.sql
+    # volumes:
+      # - ./data/ksql/:/etc/ksql/queries/
 
   ksql-cli:
-    # *-----------------------------*
-    # To connect to the KSQL CLI: 
+    # To connect to the KSQL CLI:
     #   docker-compose exec ksql-cli ksql http://ksql-server:8088
-    # *-----------------------------*
     image: confluentinc/cp-ksql-cli:5.1.0
     container_name: ksql-cli
     depends_on:
@@ -139,7 +140,7 @@ services:
     #   docker-compose exec mysql bash -c 'mysql -u root -p$MYSQL_ROOT_PASSWORD'
     #   ALTER USER 'root' IDENTIFIED WITH mysql_native_password BY '123';
     # or
-    # docker exec -it bxxxx bash
+    # docker exec -it db_mysql bash
     # mysql --user=root --password=$MYSQL_ROOT_PASSWORD    
     # ALTER USER 'root' IDENTIFIED WITH mysql_native_password BY '123';
     # exit

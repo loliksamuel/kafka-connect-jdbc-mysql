@@ -57,14 +57,14 @@ while [[ ! $(docker logs connect) =~ "Kafka Connect started" ]]; do
   fi
 done
 
-echo -e "\nStart streaming from   mysql (source connector):"
-${DIR}/connectors/submit_src_mysql.sh
-
-echo -e "\nStart streaming from   mysql (source connector):"
-${DIR}/connectors/submit_src_mysql_ts.sh
-
-echo -e "\nStart streaming to postgres (sink connector):"
-${DIR}/connectors/submit_sink_postgres.sh
+echo -e "\nStart streaming from   mysql (source connector) and sink connectors:"
+${DIR}/connectors/submit.sh
+#
+#echo -e "\nStart streaming from   mysql (source connector):"
+#${DIR}/connectors/submit_src_mysql_ts.sh
+#
+#echo -e "\nStart streaming to postgres (sink connector):"
+#${DIR}/connectors/submit_sink_postgres.sh
 
 curl  http://localhost:8083/connectors|jq
 echo -e "\nDONE! Connect to Confluent Control Center at http://localhost:9021\n"

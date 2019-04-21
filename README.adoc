@@ -24,11 +24,12 @@ Current environment
 START
 run ./scripts/start.sh
 
+
 MySQL
 MYSQL_ROOT_PASSWORD=Admin123 & echo $MYSQL_ROOT_PASSWORD
-docker-compose exec db_mysql bash -c 'mysql -u root -p$MYSQL_ROOT_PASSWORD'
- or
-docker exec -it bxxxx bash  --user=root --password=$MYSQL_ROOT_PASSWORD
+docker exec -it db_mysql bash  --user=root --password=$MYSQL_ROOT_PASSWORD
+or
+docker-compose exec mysql bash -c 'mysql -u root -p$MYSQL_ROOT_PASSWORD'
 mysql>ALTER USER 'root' IDENTIFIED WITH mysql_native_password BY '123';
 mysql> show databases;
 mysql> use demo;
@@ -38,20 +39,25 @@ mysql>exit
 
 
 KAFKA KSQL
-guidelines for a basic KSQL server:4 cores,32 GB RAM, 100 GB SSD, 1 Gbit network)
+docker exec -it ksql-cli ksql http://ksql-server:8088
+or
 docker-compose exec ksql-cli ksql http://ksql-server:8088
+guidelines for a basic KSQL server:4 cores,32 GB RAM, 100 GB SSD, 1 Gbit network)
 
 
 KAFKA CONNECT
-docker exec -it kafka-connect-jdbc-mysql_kafka-connect_1 bash
+docker exec -it connect bash
+or
+docker-compose exec kafka-connect bash
 cd /usr/share/java/kafka-connect-jdbc/jars
- ls |grep  ojdbc8.jar
+ls |grep  ojdbc8.jar
 
 
 POSTGRES
-docker-compose exec db_postgres bash -c 'psql -U $POSTGRES_USER $POSTGRES_DB'
-or
 docker exec -it db_postgres psql kafka-sink connect_user
+or
+docker-compose exec postgres bash -c 'psql -U $POSTGRES_USER $POSTGRES_DB'
+
 kafka-sink=# SELECT * from accounts;
 expect to see 10 accounts that moved here from mysql through kafka
 
@@ -60,10 +66,10 @@ STOP
 run ./scripts/stop.sh
 
 ORACLE
-docker-compose exec oracle bash -c 'sqlplus sys/$ORACLE_PWD@localhost:1521/ORCLCDB as sysdba'
+docker-compose exec db_oracle bash -c 'sqlplus sys/$ORACLE_PWD@localhost:1521/ORCLCDB as sysdba'
 
 MS SQL SERVER
-docker-compose exec mssql bash -c '/opt/mssql-tools/bin/sqlcmd -l 30 -S localhost -U sa -P $SA_PASSWORD'
+docker-compose exec db_mssql bash -c '/opt/mssql-tools/bin/sqlcmd -l 30 -S localhost -U sa -P $SA_PASSWORD'
 ----
 
 
@@ -83,11 +89,8 @@ https://docs.confluent.io/current/connect/kafka-connect-jdbc/source-connector/so
 [source,bash]
 ----
 in order to execute connector u can run  3 scripts or manually
-run ./scripts/connectors/submit_src_mysql.sh
-run ./scripts/connectors/submit_src_mysql_ts.sh
-run ./scripts/connectors/submit_sink_postgres.sh
-
-or create manually
+run ./scripts/connectors/submit.sh
+or create 3 connectors manually
 create a connector(using bulk is not a best practice, Valid Values: [, bulk, timestamp, incrementing, timestamp+incrementing])
 or
 curl -X POST http://localhost:8083/connectors -H "Content-Type: application/json" -d '{
@@ -157,6 +160,7 @@ verify after 1 sec, that u see it in the topic
 mysql>delete from demo.accounts where id=31;
 verify that jdbc connector does not support delete oparations. if u need it than consider use cdc transaction-log connector.
 
+ksql> set 'auto.offset.reset'='earliest';
 ksql> CREATE TABLE users (registertime BIGINT,  userid VARCHAR, gender VARCHAR, regionid VARCHAR)  WITH (KAFKA_TOPIC = 'mysql-08-accounts',  VALUE_FORMAT='JSON', KEY = 'userid');
 ksql>SHOW | LIST tables;
 ksql> DESCRIBE [EXTENDED] users;

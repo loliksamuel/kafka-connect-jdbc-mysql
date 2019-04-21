@@ -102,6 +102,7 @@ services:
     #   docker-compose exec oracle bash -c 'sleep 1;rlwrap sqlplus sys/$ORACLE_PWD@localhost:1521/ORCLCDB as sysdba'
     # *-----------------------------*
     image: oracle/database:12.2.0.1-ee
+    container_name: db_oracle
     environment:
       - ORACLE_PWD=Admin123
     ports:
