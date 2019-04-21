@@ -11,7 +11,7 @@ DATA1=$( cat << EOF
                 "connection.password": "asgard",
                 "topic.prefix": "mysql-08-",
                 "mode":"bulk",
-                "batch.max.rows":3,
+                "batch.max.rows":100,
                 "table.whitelist" : "demo.accounts",
                 "poll.interval.ms" : 3600000
                 }
