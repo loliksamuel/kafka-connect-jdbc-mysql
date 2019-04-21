@@ -206,8 +206,9 @@ KSQL can't infer the topic's data format, so you must provide the format of the 
 create a connector(using bulk is not a best practice, Valid Values: [, bulk, timestamp, incrementing, timestamp+incrementing])
 ----
 ksql> set 'auto.offset.reset'='earliest';
-ksql> CREATE STREAM ACCOUNTS WITH (KAFKA_TOPIC='mysql-08-accounts', VALUE_FORMAT='AVRO');
+ksql> CREATE STREAM ACCOUNTS WITH (KAFKA_TOPIC='mysql-08-accounts', VALUE_FORMAT='AVRO', KEY='id');
 ksql> SELECT ROWKEY, ID, FIRST_NAME + ' ' + LAST_NAME FROM ACCOUNTS;
+verify u see nothing. that's because u have to insert a new account first
 ksql>CREATE TABLE users (registertime BIGINT,  userid VARCHAR, gender VARCHAR, regionid VARCHAR)  WITH (KAFKA_TOPIC = 'mysql-08-accounts',  VALUE_FORMAT='JSON', KEY = 'userid');
 ksql>SHOW | LIST tables;
 ksql>DESCRIBE [EXTENDED] users;
