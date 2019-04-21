@@ -159,10 +159,11 @@ verify after 1 sec, that u see it in the topic
 
 mysql>delete from demo.accounts where id=31;
 verify that jdbc connector does not support delete oparations. if u need it than consider use cdc transaction-log connector.
----
+----
 
 ==  Play with KSQL TABLE AND STREAMS
----
+
+----
 
 Use the CREATE STREAM statement to create a stream from a Kafka topic.
 Use the CREATE STREAM AS SELECT statement to create a query stream from an existing stream.
