@@ -74,7 +74,7 @@ DATA4=$( cat << EOF
                 "incrementing.column.name": "txn_id",
                 "validate.non.null": false
                 }
-        }'
+        }
 EOF
 )
 
@@ -87,4 +87,4 @@ docker exec connect curl -X POST -H "${HEADER}" --data "${DATA1}" http://localho
 docker exec connect curl -X POST -H "${HEADER}" --data "${DATA2}" http://localhost:8083/connectors
 docker exec connect curl -X POST -H "${HEADER}" --data "${DATA3}" http://localhost:8083/connectors
 docker exec connect curl -X POST -H "${HEADER}" --data "${DATA4}" http://localhost:8083/connectors
- curl http://localhost:8083/connectors|jq
+docker exec connect curl -X GET http://localhost:8083/connectors|jq
