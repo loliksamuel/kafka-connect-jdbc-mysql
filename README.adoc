@@ -226,6 +226,9 @@ verify added an account
 kafka-sink=# \q
 ----
 
+==  other DB's connectors
+
+----
 * Postgres
 +
 [source,bash]
