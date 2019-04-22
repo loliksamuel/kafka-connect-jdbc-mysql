@@ -69,6 +69,12 @@ SCHEMA-REGISTRY
 docker logs schema-registry
 
 
+KAFKA-BROKER
+docker exec -it kafka-broker kafka-topics --create --topic sampleTopic --partitions 1 --replication-factor 1 --zookeeper zookeeper:2181
+docker exec -it kafka-broker kafka-topics --list --zookeeper zookeeper:2181
+
+
+
 ORACLE
 docker-compose exec db_oracle bash -c 'sqlplus sys/$ORACLE_PWD@localhost:1521/ORCLCDB as sysdba'
 
@@ -195,6 +201,13 @@ curl localhost:8081/subjects/mysql-12a-transactions-value/versions/1 |jq '.schem
 
 mysql>INSERT INTO demo.transactions   VALUES (1001, 1, 1.11, 'RUB', now());
 ----
+
+
+
+
+
+
+
 
 ==  Play with KSQL TABLE AND STREAMS
 
