@@ -1,0 +1,4 @@
+CREATE TABLE  t_example (registertime BIGINT,  userid VARCHAR, gender VARCHAR, regionid VARCHAR)  WITH (KAFKA_TOPIC = 'mysql-08-accounts',  VALUE_FORMAT='JSON', KEY = 'userid');
+CREATE STREAM s_accounts1 WITH (KAFKA_TOPIC='mysql-08-accounts', VALUE_FORMAT='AVRO', KEY='id');
+CREATE STREAM s_accounts2 (id INTEGER, FIRST_NAME VARCHAR, LAST_NAME VARCHAR, USERNAME VARCHAR, company VARCHAR, CREATED_DATE INTEGER, UPDATE_TS BIGINT)  WITH (KAFKA_TOPIC = 'mysql-08-accounts',  VALUE_FORMAT='AVRO', KEY = 'id');
+CREATE TABLE  t_accounts_gb as select last_name, count(*) as count from s_accounts2 group by last_name ;

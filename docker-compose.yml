@@ -121,7 +121,7 @@ services:
       KSQL_LISTENERS: http://0.0.0.0:8088
       KSQL_KSQL_SCHEMA_REGISTRY_URL: http://schema-registry:8081
       KSQL_KSQL_SERVICE_ID: confluent_rmoff_01
-      # KSQL_KSQL_QUERIES_FILE: /etc/ksql/queries/examples.sql
+      # KSQL_KSQL_QUERIES_FILE: /etc/ksql/queries/ksql.commands
     # volumes:
       # - ./data/ksql/:/etc/ksql/queries/
 
@@ -134,6 +134,9 @@ services:
       - ksql-server
     entrypoint: /bin/sh
     tty: true
+    volumes:
+      #ksql>run script 'tmp/ksql.commands';
+      - $PWD/data/ksql/ksql.commands:/tmp/ksql.commands
       
 # Other systems
   mysql:

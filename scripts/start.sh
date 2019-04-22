@@ -45,6 +45,7 @@ if [[ $(docker-compose logs connect) =~ "server returned information about unkno
   exit 1
 fi
 
+sleep 30
 # Verify Kafka Connect Worker has started within 60 seconds
 MAX_WAIT=180
 CUR_WAIT=30

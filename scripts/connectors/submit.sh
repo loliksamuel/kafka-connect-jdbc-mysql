@@ -3,7 +3,7 @@
 HEADER="Content-Type: application/json"
 DATA1=$( cat << EOF
 {
-    "name": "src-mysql",
+    "name": "src_mysql_bulk",
     "config": {
                 "connector.class": "io.confluent.connect.jdbc.JdbcSourceConnector",
                 "connection.url": "jdbc:mysql://mysql:3306/demo",
@@ -21,7 +21,7 @@ EOF
 
 DATA2=$( cat << EOF
 {
-    "name": "sink-postgres",
+    "name": "sink_postgres",
     "config": {
             "connector.class": "io.confluent.connect.jdbc.JdbcSinkConnector",
             "connection.url": "jdbc:postgresql://postgres:5432/kafka-sink?user=connect_user&password=asgard",
@@ -43,7 +43,7 @@ EOF
 
 DATA3=$( cat << EOF
 {
-    "name": "src-mysql_ts",
+    "name": "src_mysql_ts",
         "config": {
                 "connector.class": "io.confluent.connect.jdbc.JdbcSourceConnector",
                 "connection.url": "jdbc:mysql://mysql:3306/demo",
@@ -118,4 +118,8 @@ docker exec connect curl -X POST -H "${HEADER}" --data "${DATA4}" http://localho
 
 
 
-docker exec connect curl -X GET http://localhost:8083/connectors|jq
+curl http://localhost:8083/connectors/src_mysql_ts/status|jq
+curl http://localhost:8083/connectors/src_mysql_txn/status|jq
+curl http://localhost:8083/connectors/src_mysql_bulk/status|jq
+curl http://localhost:8083/connectors/sink_postgres/status|jq
+curl http://localhost:8083/connectors/|jq
