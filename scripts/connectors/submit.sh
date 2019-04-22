@@ -113,5 +113,9 @@ docker exec connect curl -X POST -H "${HEADER}" --data "${DATA2}" http://localho
 docker exec connect curl -X POST -H "${HEADER}" --data "${DATA3}" http://localhost:8083/connectors
 docker exec connect curl -X POST -H "${HEADER}" --data "${DATA4}" http://localhost:8083/connectors
 #docker exec connect curl -X PUT  -H "${HEADER}" --data "${DATA5}" http://localhost:8083/connectors
+#curl http://localhost:8083/connectors -X POST  -H "Content-Type: application/json" -d '
+#curl http://localhost:8083/connectors
+
+
 
 docker exec connect curl -X GET http://localhost:8083/connectors|jq
