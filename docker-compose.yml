@@ -20,8 +20,9 @@ services:
     # See https://rmoff.net/2018/08/02/kafka-listeners-explained/ for details
     # use docker exec -it kafka-broker bash
     # cd opt/kafka/bin
-    # kafka-topics.sh --list --zookeeper zookeeper:2181 
-    # kafka-topics.sh --create --topic my-topic --zookeeper zookeeper:2181 --partitions 1 --replication-factor 1
+    # kafka-topics --list --zookeeper zookeeper:2181
+    # kafka-topics --create --topic my-topic --zookeeper zookeeper:2181 --partitions 1 --replication-factor 1
+    # kafka-topics --delete --topic my-topic --zookeeper zookeeper:2181
       - 9092:9092
     environment:
       KAFKA_BROKER_ID: 1
