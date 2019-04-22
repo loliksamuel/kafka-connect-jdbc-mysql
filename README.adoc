@@ -220,6 +220,7 @@ KSQL can't infer the topic's data format, so you must provide the format of the 
 create a connector(using bulk is not a best practice, Valid Values: [, bulk, timestamp, incrementing, timestamp+incrementing])
 ----
 ksql> SET 'auto.offset.reset'='earliest';
+ksql>>SHOW |LIST functions;LIST properties;LIST streams;LIST topics;LIST tables;LIST queries;
 ksql>run script 'tmp/ksql.commands';
 or do it manually
 ksql>CREATE STREAM s_accounts1 WITH (KAFKA_TOPIC='mysql-08-accounts', VALUE_FORMAT='AVRO', KEY='id');
@@ -245,7 +246,6 @@ verify after 1 sec, that u see it in the table accountGroupByTable2
 
 ksql>CREATE TABLE t_account_gb3  (usertimestamp BIGINT, user_id VARCHAR, gender VARCHAR, region_id VARCHAR) KAFKA_TOPIC = 'mysql-08-accounts',KEY = 'user_id');
 
-ksql>>SHOW |LIST functions;LIST properties;LIST streams;LIST topics;LIST tables;LIST queries;
 ksql>print 'ACCOUNTGROUPBY' FROM BEGINNING;
 ???
 ksql>DROP TABLE [IF EXISTS] table_name [DELETE TOPIC];

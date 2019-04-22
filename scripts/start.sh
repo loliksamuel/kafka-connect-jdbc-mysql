@@ -30,7 +30,7 @@ ${DIR}/stop.sh
 
 # Bring up Docker Compose
 echo -e "Bringing up Docker Compose"
-docker-compose up -d
+docker-compose up -d --build
 
 # Verify Docker containers started
 if [[ $(docker-compose ps) =~ "Exit 137" ]]; then
@@ -45,7 +45,8 @@ if [[ $(docker-compose logs connect) =~ "server returned information about unkno
   exit 1
 fi
 
-sleep 30
+echo "Sleeping 120 seconds to wait for all services to come up"
+sleep 120
 # Verify Kafka Connect Worker has started within 60 seconds
 MAX_WAIT=180
 CUR_WAIT=30
@@ -68,4 +69,11 @@ ${DIR}/connectors/submit.sh
 #${DIR}/connectors/submit_sink_postgres.sh
 
 curl  http://localhost:8083/connectors|jq
+
+sleep 30
+docker-compose exec ksql-cli bash -c "ksql http://ksql-server:8088 <<EOF
+run script '/tmp/ksql.commands';
+exit ;
+EOF
+"
 echo -e "\nDONE! Connect to Confluent Control Center at http://localhost:9021\n"

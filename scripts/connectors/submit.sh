@@ -107,19 +107,22 @@ EOF
 #   CONNECT_REST_ADVERTISED_HOST_NAME: "connect"
 #  https://connect:8083/connectors
 
-
+sleep 1
 docker exec connect curl -X POST -H "${HEADER}" --data "${DATA1}" http://localhost:8083/connectors
+sleep 1
 docker exec connect curl -X POST -H "${HEADER}" --data "${DATA2}" http://localhost:8083/connectors
+sleep 1
 docker exec connect curl -X POST -H "${HEADER}" --data "${DATA3}" http://localhost:8083/connectors
+sleep 1
 docker exec connect curl -X POST -H "${HEADER}" --data "${DATA4}" http://localhost:8083/connectors
 #docker exec connect curl -X PUT  -H "${HEADER}" --data "${DATA5}" http://localhost:8083/connectors
 #curl http://localhost:8083/connectors -X POST  -H "Content-Type: application/json" -d '
 #curl http://localhost:8083/connectors
 
 
-
-curl http://localhost:8083/connectors/src_mysql_ts/status|jq
-curl http://localhost:8083/connectors/src_mysql_txn/status|jq
-curl http://localhost:8083/connectors/src_mysql_bulk/status|jq
-curl http://localhost:8083/connectors/sink_postgres/status|jq
-curl http://localhost:8083/connectors/|jq
+sleep 10
+docker exec connect curl http://localhost:8083/connectors/src_mysql_ts/status|jq
+docker exec connect curl http://localhost:8083/connectors/src_mysql_txn/status|jq
+docker exec connect curl http://localhost:8083/connectors/src_mysql_bulk/status|jq
+docker exec connect curl http://localhost:8083/connectors/sink_postgres/status|jq
+docker exec connect curl http://localhost:8083/connectors/|jq
