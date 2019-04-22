@@ -81,7 +81,7 @@ EOF
 
 DATA5=$( cat << EOF
 {
-    "name": "sink_postgres_gb",
+    "name": "sink_postgres_gb2",
     "config": {
             "connector.class": "io.confluent.connect.jdbc.JdbcSinkConnector",
             "connection.url": "jdbc:postgresql://postgres:5432/kafka-sink?user=connect_user&password=asgard",
@@ -98,10 +98,34 @@ DATA5=$( cat << EOF
             "pk.mode": "record_value",
             "pk.fields": "ROWKEY",
             "topics": "T_ACCOUNTS_GB"
-    }
-}
+                }
+        }
 EOF
 )
+
+
+
+DATA6=$( cat << EOF
+{
+    "name": "sink_postgres_gb3",
+    "config": {
+     "connector.class": "io.confluent.connect.jdbc.JdbcSinkConnector",
+     "connection.url": "jdbc:postgresql://postgres:5432/kafka-sink?user=connect_user&password=asgard",
+     "connection.user": "connect_user",
+     "connection.password": "asgard",
+
+     "schema.ignore": "true",
+     "topics": "T_ACCOUNTS_GB",
+     "key.converter": "org.apache.kafka.connect.storage.StringConverter",
+     "value.converter.schemas.enable": false,
+      "key.ignore": "true",
+     "value.converter": "org.apache.kafka.connect.json.JsonConverter",
+     "type.name": "type.name=kafkaconnect"
+                }
+        }
+EOF
+)
+
 
 #   CONNECT_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM: "HTTPS"
 #   CONNECT_REST_ADVERTISED_HOST_NAME: "connect"
@@ -120,7 +144,8 @@ docker exec connect curl -X POST -H "${HEADER}" --data "${DATA4}" http://localho
 #curl http://localhost:8083/connectors
 
 
-sleep 10
+echo "Sleeping 30 seconds to wait for all connectors to come up"
+sleep 30
 docker exec connect curl http://localhost:8083/connectors/src_mysql_ts/status|jq
 docker exec connect curl http://localhost:8083/connectors/src_mysql_txn/status|jq
 docker exec connect curl http://localhost:8083/connectors/src_mysql_bulk/status|jq

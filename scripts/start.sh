@@ -38,15 +38,15 @@ if [[ $(docker-compose ps) =~ "Exit 137" ]]; then
   exit 1
 fi
 
-
+echo "Sleeping 120 seconds to wait for all services to come up"
+sleep 120
 # Verify Docker has the latest cp-kafka-connect image
 if [[ $(docker-compose logs connect) =~ "server returned information about unknown correlation ID" ]]; then
   echo -e "\nERROR: Please update the cp-kafka-connect image with 'docker-compose pull'\n"
   exit 1
 fi
 
-echo "Sleeping 120 seconds to wait for all services to come up"
-sleep 120
+
 # Verify Kafka Connect Worker has started within 60 seconds
 MAX_WAIT=180
 CUR_WAIT=30
@@ -70,9 +70,17 @@ ${DIR}/connectors/submit.sh
 
 curl  http://localhost:8083/connectors|jq
 
+echo "Sleeping 30 seconds to wait for all connectors to come up"
 sleep 30
 docker-compose exec ksql-cli bash -c "ksql http://ksql-server:8088 <<EOF
 run script '/tmp/ksql.commands';
+exit ;
+EOF
+"
+
+MYSQL_ROOT_PASSWORD=Admin123
+docker exec -it db_mysql bash  -c 'mysql -u root -p$MYSQL_ROOT_PASSWORD' <<EOF
+ALTER USER 'root' IDENTIFIED WITH mysql_native_password BY '123';
 exit ;
 EOF
 "
