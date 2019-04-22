@@ -1,0 +1,4 @@
+DROP TABLE  t_example;
+DROP STREAM s_accounts1;
+DROP STREAM s_accounts2;
+DROP TABLE  t_accounts_gb;
