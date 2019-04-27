@@ -73,7 +73,7 @@ KAFKA-BROKER
 docker exec -it kafka-broker kafka-topics --delete --topic sampleTopic --zookeeper zookeeper:2181
 docker exec -it kafka-broker kafka-topics --create --topic sampleTopic --zookeeper zookeeper:2181 --partitions 1 --replication-factor 1
 docker exec -it kafka-broker kafka-topics --list --zookeeper zookeeper:2181
-
+docker logs  kafka|grep "INFO Kafka version"
 
 
 ORACLE
