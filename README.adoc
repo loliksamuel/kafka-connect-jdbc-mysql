@@ -70,9 +70,27 @@ docker logs schema-registry
 
 
 KAFKA-BROKER
-docker exec -it kafka-broker kafka-topics --delete --topic sampleTopic --zookeeper zookeeper:2181
-docker exec -it kafka-broker kafka-topics --create --topic sampleTopic --zookeeper zookeeper:2181 --partitions 1 --replication-factor 1
-docker exec -it kafka-broker kafka-topics --list --zookeeper zookeeper:2181
+
+docker exec -it kafka-broker kafka-topics --delete --zookeeper zookeeper:2181 --topic sampleTopic 
+or 
+docker exec -it kafka-broker bash
+kafka-topics --zookeeper zookeeper:2181 --topic sampleTopic --delete 
+kafka-topics --zookeeper zookeeper:2181 --topic sampleTopic --create  --partitions 1 --replication-factor 1
+kafka-topics --zookeeper zookeeper:2181 --topic docker-connect-offsets --describe
+kafka-topics --zookeeper zookeeper:2181 --list 
+kafka-log-dirs --describe --bootstrap-server 0.0.0.0:9092 --topic-list  docker-connect-offsets
+kafka-configs  --describe --zookeeper zookeeper:2181 --entity-type topics
+kafka-consumer-perf-test --topic benchmark-3-3-none --zookeeper kafka-zk-1:2181,kafka-zk-2:2181,kafka-zk-3:2181 --messages 15000000 --threads 1
+kafka-producer-perf-test  --topic benchmark-1-1-none \
+--num-records 15000000 \
+--record-size 100 \
+--throughput 15000000 \
+--producer-props \
+acks=1 \
+bootstrap.servers=kafka-kf-1:9092,kafka-kf-2:9092,kafka-kf-3:9092 \
+buffer.memory=67108864 \
+compression.type=none \
+batch.size=8196
 docker logs  kafka|grep "INFO Kafka version"
 
 
