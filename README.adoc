@@ -81,22 +81,19 @@ kafka-topics --zookeeper zookeeper:2181 --list
 kafka-configs --zookeeper zookeeper:2181 --describe  --entity-type topics|brokers|clients
 kafka-log-dirs --bootstrap-server 0.0.0.0:9092 --describe --topic-list  docker-connect-offsets
 
-kafka-producer-perf-test --topic benchmark1 --num-records 1000000 --record-size 100 --throughput 1000000 \
---producer-props acks=1 bootstrap.servers=0.0.0.0:9092 buffer.memory=67108864 compression.type=none batch.size=8196
-1,000,000 records sent, 100111 records/sec (10.4 MB/sec), 433 ms avg latency, 579 ms max latency....
+kafka-producer-perf-test --num-records 10100100 --throughput 10100100 --record-size 100 \
+--producer-props acks=1 bootstrap.servers=0.0.0.0:9092 buffer.memory=67108864 compression.type=none batch.size=8196 --topic benchmark1 
+10,100,100 records sent | 148,000 records/sec | 14.1 MB/sec | 0.433 sec avg latency | 0.579 sec max latency....
 
-kafka-consumer-perf-test --topic benchmark1 --broker-list 0.0.0.0:9092 --messages 1000000 --threads 1
+kafka-consumer-perf-test --broker-list 0.0.0.0:9092 --messages 10100100 --threads 1 --topic benchmark1 
 
-from=2019-05-01 13:14:02:395, 
-to = 2019-05-01 13:14:04:360
-data.consumed.in.MB=95.4 MB
- 48.5 MB/sec
- 1,000,008 Msgs
- 508,910 Msg/sec
-rebalance.time.ms=123
-fetch.time.ms=1,842
-fetch.MB.sec=52.0
-fetch.nMsg.sec=542,892
+from=2019-05-01 14:00:00:000 
+to = 2019-05-01 14:00:09:001
+10,100,100 Msgs   consumed
+ 1,146,593 Msg/sec consumed
+    963.3 MB      consumed
+    109.3 MB/sec  consumed
+
 
 docker logs  kafka|grep "INFO Kafka version"
 
