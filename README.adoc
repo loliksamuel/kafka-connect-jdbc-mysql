@@ -74,13 +74,6 @@ KAFKA-BROKER
 docker exec -it kafka-broker kafka-topics --delete --zookeeper zookeeper:2181 --topic sampleTopic 
 or 
 docker exec -it kafka-broker bash
-kafka-topics --zookeeper zookeeper:2181 --topic sampleTopic --delete 
-kafka-topics --zookeeper zookeeper:2181 --topic sampleTopic --create  --partitions 1 --replication-factor 1
-kafka-topics --zookeeper zookeeper:2181 --topic docker-connect-offsets --describe
-kafka-topics --zookeeper zookeeper:2181 --list 
-kafka-configs --zookeeper zookeeper:2181 --describe  --entity-type topics|brokers|clients
-kafka-log-dirs --bootstrap-server 0.0.0.0:9092 --describe --topic-list  docker-connect-offsets
-
 kafka-producer-perf-test --num-records 10100100 --throughput 10100100 --record-size 100 \
 --producer-props acks=1 bootstrap.servers=0.0.0.0:9092 buffer.memory=67108864 compression.type=none batch.size=8196 --topic benchmark1 
 10,100,100 records sent | 148,000 records/sec | 14.1 MB/sec | 0.433 sec avg latency | 0.579 sec max latency....
@@ -93,6 +86,19 @@ to = 2019-05-01 14:00:09:001
  1,146,593 Msg/sec consumed
     963.3 MB      consumed
     109.3 MB/sec  consumed
+
+in console #1
+kafka-console-producer --broker-list 0.0.0.0:9092 --topic t1
+in console #2
+kafka-console-consumer --bootstrap-server 0.0.0.0:9092 --topic t1
+
+kafka-topics --zookeeper zookeeper:2181 --topic t1 --delete 
+kafka-topics --zookeeper zookeeper:2181 --topic t1 --create  --partitions 1 --replication-factor 1
+kafka-topics --zookeeper zookeeper:2181 --topic docker-connect-offsets --describe
+kafka-topics --zookeeper zookeeper:2181 --list 
+kafka-configs --zookeeper zookeeper:2181 --describe  --entity-type topics|brokers|clients
+kafka-log-dirs --bootstrap-server 0.0.0.0:9092 --describe --topic-list  benchmark1
+
 
 
 docker logs  kafka|grep "INFO Kafka version"
