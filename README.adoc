@@ -94,9 +94,10 @@ kafka-console-consumer --bootstrap-server 0.0.0.0:9092 --topic t1
 
 kafka-topics --zookeeper zookeeper:2181 --topic t1 --delete 
 kafka-topics --zookeeper zookeeper:2181 --topic t1 --create  --partitions 1 --replication-factor 1
-kafka-topics --zookeeper zookeeper:2181 --topic docker-connect-offsets --describe
+kafka-topics --zookeeper zookeeper:2181 --topic t1 --describe
 kafka-topics --zookeeper zookeeper:2181 --list 
 kafka-configs --zookeeper zookeeper:2181 --describe  --entity-type topics|brokers|clients
+kafka-run-class kafka.tools.GetOffsetShell --broker-list 0.0.0.0:9092 --topic t1 --partitions 0,1,2
 kafka-log-dirs --bootstrap-server 0.0.0.0:9092 --describe --topic-list  benchmark1
 
 
