@@ -100,7 +100,7 @@ key2:value2
 key3:value3
 key3:value3
 in console #2
-kafka-console-consumer --bootstrap-server 0.0.0.0:9092 --topic t_compact  
+kafka-console-consumer --bootstrap-server 0.0.0.0:9092 --topic t_compact --property print.key=true --property key.separator="-" --from-beginning
 
 
 kafka-topics --zookeeper $ZK --topic t1 --delete 
