@@ -74,11 +74,12 @@ KAFKA-BROKER
 docker exec -it kafka-broker kafka-topics --delete --zookeeper zookeeper:2181 --topic sampleTopic 
 or 
 docker exec -it kafka-broker bash
+>ZK=zookeeper:2181
 kafka-producer-perf-test --num-records 10100100 --throughput 10100100 --record-size 100 \
 --producer-props acks=1 bootstrap.servers=0.0.0.0:9092 buffer.memory=67108864 compression.type=none batch.size=8196 --topic benchmark1 
 10,100,100 records sent | 148,000 records/sec | 14.1 MB/sec | 0.433 sec avg latency | 0.579 sec max latency....
 
-kafka-consumer-perf-test --broker-list 0.0.0.0:9092 --messages 10100100 --threads 1 --topic benchmark1 
+kafka-consumer-perf-test --broker-list 0.0.0.0:9092 --messages 10100100 --threads 1 --topic benchmark1  
 
 from=2019-05-01 14:00:00:000 
 to = 2019-05-01 14:00:09:001
@@ -90,14 +91,25 @@ to = 2019-05-01 14:00:09:001
 in console #1
 kafka-console-producer --broker-list 0.0.0.0:9092 --topic t1
 in console #2
-kafka-console-consumer --bootstrap-server 0.0.0.0:9092 --topic t1
+kafka-console-consumer --bootstrap-server 0.0.0.0:9092 --topic t1  
 
-kafka-topics --zookeeper zookeeper:2181 --topic t1 --delete 
-kafka-topics --zookeeper zookeeper:2181 --topic t1 --create  --partitions 1 --replication-factor 1 --config max.message.bytes=64000
-kafka-topics --zookeeper zookeeper:2181 --list 
-kafka-configs --zookeeper zookeeper:2181 --entity-type topics -entity-name t1 --alter --add-config \ 'retention.ms=1000,max.message.bytes=2048000,cleanup.policy=delete,min.compaction.lag.ms=1000'
-kafka-configs --zookeeper zookeeper:2181 --entity-type topics --describe  
-kafka-topics --zookeeper zookeeper:2181 --topic t1 --describe
+or in concole #1
+kafka-console-producer --broker-list 0.0.0.0:9092 --topic t_compact --property "parse.key=true" --property "key.separator=:"
+key1:value1
+key2:value2
+key3:value3
+key3:value3
+in console #2
+kafka-console-consumer --bootstrap-server 0.0.0.0:9092 --topic t_compact  
+
+
+kafka-topics --zookeeper $ZK --topic t1 --delete 
+kafka-topics --zookeeper $ZK --topic t1 --create  --partitions 3 --replication-factor 1 --config max.message.bytes=64000
+kafka-topics --zookeeper $ZK --topic t_compact --create --partitions 3 --replication-factor 1 --config min.insync.replicas=1 --config cleanup.policy=compact --config segment.bytes=1048576
+kafka-topics --zookeeper $ZK --list 
+kafka-configs --zookeeper $ZK --entity-type topics -entity-name t1 --alter --add-config \ 'retention.ms=1000,max.message.bytes=2048000,cleanup.policy=delete,min.compaction.lag.ms=1000'
+kafka-configs --zookeeper $ZK --entity-type topics --describe  
+kafka-topics --zookeeper $ZK --topic t1 --describe
 kafka-run-class kafka.tools.GetOffsetShell --broker-list 0.0.0.0:9092 --topic t1 --partitions 0,1,2
 kafka-log-dirs --bootstrap-server 0.0.0.0:9092 --describe --topic-list  benchmark1
 
