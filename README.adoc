@@ -101,6 +101,10 @@ key3:value3
 key3:value3
 in console #2
 kafka-console-consumer --bootstrap-server 0.0.0.0:9092 --topic t_compact --property print.key=true --property key.separator="-" --from-beginning
+notes: 
+1. compact mode could not be set up!  
+2. id is in bytes
+3. create table ,streams did not work
 
 
 kafka-topics --zookeeper $ZK --topic t1 --delete 
@@ -109,6 +113,9 @@ kafka-topics --zookeeper $ZK --topic t_compact --create --partitions 3 --replica
 kafka-topics --zookeeper $ZK --list 
 kafka-configs --zookeeper $ZK --entity-type topics --entity-name t1 --alter --add-config \ 'retention.ms=1000,max.message.bytes=2048000,cleanup.policy=delete,min.compaction.lag.ms=1000'
 kafka-configs --zookeeper $ZK --entity-type topics --describe  
+kafka-configs --zookeeper $ZK --entity-type brokers --entity-name 0  --alter --add-config log.cleanup.policy=compact
+kafka-configs --zookeeper $ZK --entity-type brokers --describe  
+
 kafka-topics --zookeeper $ZK --topic t1 --describe
 kafka-run-class kafka.tools.GetOffsetShell --broker-list 0.0.0.0:9092 --topic t1 --partitions 0,1,2
 kafka-log-dirs --bootstrap-server 0.0.0.0:9092 --describe --topic-list  t_compact
